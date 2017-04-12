@@ -111,7 +111,8 @@ ANNOTATION_MAPPING = {
         },
         'group': {
             'type': 'string',
-        }
+        },
+        'has_replies': {'type': 'boolean'}
     }
 }
 
