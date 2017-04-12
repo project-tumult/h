@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 import copy
 
-from pyramid import security
 from zope.interface.verify import verifyObject
 from zope.interface.exceptions import DoesNotImplement
 
@@ -38,7 +37,6 @@ class AnnotationJSONPresenter(AnnotationBasePresenter):
         docpresenter = DocumentJSONPresenter(self.annotation.document)
 
         base = {
-            'permissions': self.permissions,
             'document': docpresenter.asdict(),
             'links': self.links,
         }
@@ -51,25 +49,3 @@ class AnnotationJSONPresenter(AnnotationBasePresenter):
 
         return annotation
 
-    @property
-    def permissions(self):
-        """
-        Return a permissions dict for the given annotation.
-
-        Converts our simple internal annotation storage format into the legacy
-        complex permissions dict format that is still used in some places.
-
-        """
-        read = self.annotation.userid
-        if self.annotation.shared:
-            read = 'group:{}'.format(self.annotation.groupid)
-
-            principals = security.principals_allowed_by_permission(
-                    self.annotation_resource, 'read')
-            if security.Everyone in principals:
-                read = 'group:__world__'
-
-        return {'read': [read],
-                'admin': [self.annotation.userid],
-                'update': [self.annotation.userid],
-                'delete': [self.annotation.userid]}

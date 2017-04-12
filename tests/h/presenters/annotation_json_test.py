@@ -5,8 +5,6 @@ from __future__ import unicode_literals
 import mock
 import pytest
 
-from pyramid import security
-from pyramid.authorization import ACLAuthorizationPolicy
 from zope.interface import implementer
 
 from h.formatters.interfaces import IAnnotationFormatter
@@ -43,19 +41,12 @@ class IDDuplicatingFormatter(object):
 
 class TestAnnotationJSONPresenter(object):
     def test_asdict(self, document_asdict, group_service, fake_links_service):
-        ann = mock.Mock(userid='acct:luke',
-                        groupid='__world__',
-                        shared=True,
-                        extra={'extra-1': 'foo', 'extra-2': 'bar'})
+        ann = mock.Mock(extra={'extra-1': 'foo', 'extra-2': 'bar'})
         resource = AnnotationResource(ann, group_service, fake_links_service)
 
         document_asdict.return_value = {'foo': 'bar'}
 
-        expected = {'permissions': {'read': ['group:__world__'],
-                                    'admin': ['acct:luke'],
-                                    'update': ['acct:luke'],
-                                    'delete': ['acct:luke']},
-                    'document': {'foo': 'bar'},
+        expected = {'document': {'foo': 'bar'},
                     'links': {'giraffe': 'http://giraffe.com',
                               'toad': 'http://toad.net'},
                     'extra-1': 'foo',
@@ -131,33 +122,6 @@ class TestAnnotationJSONPresenter(object):
 
         assert output['duplicated-id'] == 'the-id'
 
-    @pytest.mark.usefixtures('policy')
-    @pytest.mark.parametrize('annotation,group_readable,action,expected', [
-        (mock.Mock(userid='acct:luke', shared=False), 'world', 'read', ['acct:luke']),
-        (mock.Mock(userid='acct:luke', groupid='abcde', shared=False), 'members', 'read', ['acct:luke']),
-        (mock.Mock(groupid='__world__', shared=True), 'world', 'read', ['group:__world__']),
-        (mock.Mock(groupid='lulapalooza', shared=True), 'members', 'read', ['group:lulapalooza']),
-        (mock.Mock(groupid='publisher', shared=True), 'world', 'read', ['group:__world__']),
-        (mock.Mock(userid='acct:luke'), None, 'admin', ['acct:luke']),
-        (mock.Mock(userid='acct:luke'), None, 'update', ['acct:luke']),
-        (mock.Mock(userid='acct:luke'), None, 'delete', ['acct:luke']),
-        ])
-    def test_permissions(self, annotation, group_readable, action, expected, group_service, fake_links_service):
-        annotation.deleted = False
-
-        group_principals = {
-            'members': (security.Allow, 'group:{}'.format(annotation.groupid), 'read'),
-            'world': (security.Allow, security.Everyone, 'read'),
-            None: security.DENY_ALL,
-        }
-        group = mock.Mock(spec_set=['__acl__'])
-        group.__acl__.return_value = [group_principals[group_readable]]
-        group_service.find.return_value = group
-
-        resource = AnnotationResource(annotation, group_service, fake_links_service)
-        presenter = AnnotationJSONPresenter(resource)
-        assert expected == presenter.permissions[action]
-
     def test_exception_for_wrong_formatter_type(self):
         with pytest.raises(ValueError) as exc:
             AnnotationJSONPresenter(mock.Mock(), formatters=[mock.Mock()])
@@ -167,10 +131,3 @@ class TestAnnotationJSONPresenter(object):
     @pytest.fixture
     def document_asdict(self, patch):
         return patch('h.presenters.annotation_json.DocumentJSONPresenter.asdict')
-
-    @pytest.fixture
-    def policy(self, pyramid_config):
-        """Set up a fake authentication policy with a real ACL authorization policy."""
-        policy = ACLAuthorizationPolicy()
-        pyramid_config.testing_securitypolicy(None)
-        pyramid_config.set_authorization_policy(policy)
