@@ -38,7 +38,6 @@ class AnnotationJSONPresenter(AnnotationBasePresenter):
 
         base = {
             'document': docpresenter.asdict(),
-            'links': self.links,
         }
 
         annotation = copy.copy(self.annotation.extra) or {}
@@ -48,4 +47,3 @@ class AnnotationJSONPresenter(AnnotationBasePresenter):
             annotation.update(formatter.format(self.annotation_resource))
 
         return annotation
-

@@ -22,6 +22,7 @@ class AnnotationJSONPresentationService(object):
             formatters.AnnotationCoreFormatter(),
             formatters.AnnotationFlagFormatter(flag_svc, user),
             formatters.AnnotationHiddenFormatter(moderation_svc, user),
+            formatters.AnnotationLinksFormatter(links_svc),
             formatters.AnnotationModerationFormatter(flag_count_svc, user, has_permission),
             formatters.AnnotationPermissionsFormatter(),
             formatters.AnnotationTimestampsFormatter(),

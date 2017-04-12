@@ -47,8 +47,6 @@ class TestAnnotationJSONPresenter(object):
         document_asdict.return_value = {'foo': 'bar'}
 
         expected = {'document': {'foo': 'bar'},
-                    'links': {'giraffe': 'http://giraffe.com',
-                              'toad': 'http://toad.net'},
                     'extra-1': 'foo',
                     'extra-2': 'bar'}
 
