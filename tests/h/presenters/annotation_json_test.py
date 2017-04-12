@@ -45,40 +45,25 @@ class IDDuplicatingFormatter(object):
 
 class TestAnnotationJSONPresenter(object):
     def test_asdict(self, document_asdict, group_service, fake_links_service):
-        ann = mock.Mock(id='the-id',
-                        created=datetime.datetime(2016, 2, 24, 18, 3, 25, 768),
+        ann = mock.Mock(created=datetime.datetime(2016, 2, 24, 18, 3, 25, 768),
                         updated=datetime.datetime(2016, 2, 29, 10, 24, 5, 564),
                         userid='acct:luke',
-                        target_uri='http://example.com',
-                        text='It is magical!',
-                        tags=['magic'],
                         groupid='__world__',
                         shared=True,
-                        target_selectors=[{'TestSelector': 'foobar'}],
-                        references=['referenced-id-1', 'referenced-id-2'],
                         extra={'extra-1': 'foo', 'extra-2': 'bar'})
         resource = AnnotationResource(ann, group_service, fake_links_service)
 
         document_asdict.return_value = {'foo': 'bar'}
 
-        expected = {'id': 'the-id',
-                    'created': '2016-02-24T18:03:25.000768+00:00',
+        expected = {'created': '2016-02-24T18:03:25.000768+00:00',
                     'updated': '2016-02-29T10:24:05.000564+00:00',
-                    'user': 'acct:luke',
-                    'uri': 'http://example.com',
-                    'text': 'It is magical!',
-                    'tags': ['magic'],
-                    'group': '__world__',
                     'permissions': {'read': ['group:__world__'],
                                     'admin': ['acct:luke'],
                                     'update': ['acct:luke'],
                                     'delete': ['acct:luke']},
-                    'target': [{'source': 'http://example.com',
-                                'selector': [{'TestSelector': 'foobar'}]}],
                     'document': {'foo': 'bar'},
                     'links': {'giraffe': 'http://giraffe.com',
                               'toad': 'http://toad.net'},
-                    'references': ['referenced-id-1', 'referenced-id-2'],
                     'extra-1': 'foo',
                     'extra-2': 'bar'}
 
@@ -87,12 +72,16 @@ class TestAnnotationJSONPresenter(object):
         assert result == expected
 
     def test_asdict_extra_cannot_override_other_data(self, document_asdict, group_service, fake_links_service):
-        ann = mock.Mock(id='the-real-id', extra={'id': 'the-extra-id'})
+        ann = mock.Mock(extra={'flagged': 'yasss'})
         resource = AnnotationResource(ann, group_service, fake_links_service)
         document_asdict.return_value = {}
 
-        presented = AnnotationJSONPresenter(resource).asdict()
-        assert presented['id'] == 'the-real-id'
+        formatters = [
+            FakeFormatter({'flagged': 'nope'}),
+        ]
+
+        presented = AnnotationJSONPresenter(resource, formatters).asdict()
+        assert presented['flagged'] == 'nope'
 
     def test_asdict_extra_uses_copy_of_extra(self, document_asdict, group_service, fake_links_service):
         extra = {'foo': 'bar'}

@@ -19,6 +19,7 @@ class AnnotationJSONPresentationService(object):
         self.links_svc = links_svc
 
         self.formatters = [
+            formatters.AnnotationCoreFormatter(),
             formatters.AnnotationFlagFormatter(flag_svc, user),
             formatters.AnnotationHiddenFormatter(moderation_svc, user),
             formatters.AnnotationModerationFormatter(flag_count_svc, user, has_permission)
