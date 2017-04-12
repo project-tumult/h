@@ -38,8 +38,6 @@ class AnnotationJSONPresenter(AnnotationBasePresenter):
         docpresenter = DocumentJSONPresenter(self.annotation.document)
 
         base = {
-            'created': self.created,
-            'updated': self.updated,
             'permissions': self.permissions,
             'document': docpresenter.asdict(),
             'links': self.links,

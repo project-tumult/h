@@ -2,8 +2,6 @@
 
 from __future__ import unicode_literals
 
-import datetime
-
 import mock
 import pytest
 
@@ -45,9 +43,7 @@ class IDDuplicatingFormatter(object):
 
 class TestAnnotationJSONPresenter(object):
     def test_asdict(self, document_asdict, group_service, fake_links_service):
-        ann = mock.Mock(created=datetime.datetime(2016, 2, 24, 18, 3, 25, 768),
-                        updated=datetime.datetime(2016, 2, 29, 10, 24, 5, 564),
-                        userid='acct:luke',
+        ann = mock.Mock(userid='acct:luke',
                         groupid='__world__',
                         shared=True,
                         extra={'extra-1': 'foo', 'extra-2': 'bar'})
@@ -55,9 +51,7 @@ class TestAnnotationJSONPresenter(object):
 
         document_asdict.return_value = {'foo': 'bar'}
 
-        expected = {'created': '2016-02-24T18:03:25.000768+00:00',
-                    'updated': '2016-02-29T10:24:05.000564+00:00',
-                    'permissions': {'read': ['group:__world__'],
+        expected = {'permissions': {'read': ['group:__world__'],
                                     'admin': ['acct:luke'],
                                     'update': ['acct:luke'],
                                     'delete': ['acct:luke']},

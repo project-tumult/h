@@ -22,7 +22,8 @@ class AnnotationJSONPresentationService(object):
             formatters.AnnotationCoreFormatter(),
             formatters.AnnotationFlagFormatter(flag_svc, user),
             formatters.AnnotationHiddenFormatter(moderation_svc, user),
-            formatters.AnnotationModerationFormatter(flag_count_svc, user, has_permission)
+            formatters.AnnotationModerationFormatter(flag_count_svc, user, has_permission),
+            formatters.AnnotationTimestampsFormatter(),
         ]
 
     def present(self, annotation_resource):
