@@ -40,24 +40,19 @@ class IDDuplicatingFormatter(object):
 
 
 class TestAnnotationJSONPresenter(object):
-    def test_asdict(self, document_asdict, group_service, fake_links_service):
+    def test_asdict(self, group_service, fake_links_service):
         ann = mock.Mock(extra={'extra-1': 'foo', 'extra-2': 'bar'})
         resource = AnnotationResource(ann, group_service, fake_links_service)
 
-        document_asdict.return_value = {'foo': 'bar'}
-
-        expected = {'document': {'foo': 'bar'},
-                    'extra-1': 'foo',
-                    'extra-2': 'bar'}
+        expected = {'extra-1': 'foo', 'extra-2': 'bar'}
 
         result = AnnotationJSONPresenter(resource).asdict()
 
         assert result == expected
 
-    def test_asdict_extra_cannot_override_other_data(self, document_asdict, group_service, fake_links_service):
+    def test_asdict_extra_cannot_override_other_data(self, group_service, fake_links_service):
         ann = mock.Mock(extra={'flagged': 'yasss'})
         resource = AnnotationResource(ann, group_service, fake_links_service)
-        document_asdict.return_value = {}
 
         formatters = [
             FakeFormatter({'flagged': 'nope'}),
@@ -66,11 +61,10 @@ class TestAnnotationJSONPresenter(object):
         presented = AnnotationJSONPresenter(resource, formatters).asdict()
         assert presented['flagged'] == 'nope'
 
-    def test_asdict_extra_uses_copy_of_extra(self, document_asdict, group_service, fake_links_service):
+    def test_asdict_extra_uses_copy_of_extra(self, group_service, fake_links_service):
         extra = {'foo': 'bar'}
         ann = mock.Mock(id='my-id', extra=extra)
         resource = AnnotationResource(ann, group_service, fake_links_service)
-        document_asdict.return_value = {}
 
         AnnotationJSONPresenter(resource).asdict()
 
@@ -125,7 +119,3 @@ class TestAnnotationJSONPresenter(object):
             AnnotationJSONPresenter(mock.Mock(), formatters=[mock.Mock()])
 
         assert 'not implementing IAnnotationFormatter interface' in exc.value.message
-
-    @pytest.fixture
-    def document_asdict(self, patch):
-        return patch('h.presenters.annotation_json.DocumentJSONPresenter.asdict')

@@ -9,7 +9,6 @@ from zope.interface.exceptions import DoesNotImplement
 
 from h.formatters.interfaces import IAnnotationFormatter
 from h.presenters.annotation_base import AnnotationBasePresenter
-from h.presenters.document_json import DocumentJSONPresenter
 
 
 class AnnotationJSONPresenter(AnnotationBasePresenter):
@@ -34,14 +33,7 @@ class AnnotationJSONPresenter(AnnotationBasePresenter):
         self._formatters.append(formatter)
 
     def asdict(self):
-        docpresenter = DocumentJSONPresenter(self.annotation.document)
-
-        base = {
-            'document': docpresenter.asdict(),
-        }
-
         annotation = copy.copy(self.annotation.extra) or {}
-        annotation.update(base)
 
         for formatter in self._formatters:
             annotation.update(formatter.format(self.annotation_resource))

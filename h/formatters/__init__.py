@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from h.formatters.annotation_core import AnnotationCoreFormatter
+from h.formatters.annotation_document import AnnotationDocumentFormatter
 from h.formatters.annotation_flag import AnnotationFlagFormatter
 from h.formatters.annotation_hidden import AnnotationHiddenFormatter
 from h.formatters.annotation_links import AnnotationLinksFormatter
@@ -12,6 +13,7 @@ from h.formatters.annotation_timestamps import AnnotationTimestampsFormatter
 
 __all__ = (
     'AnnotationCoreFormatter',
+    'AnnotationDocumentFormatter',
     'AnnotationFlagFormatter',
     'AnnotationHiddenFormatter',
     'AnnotationLinksFormatter',
