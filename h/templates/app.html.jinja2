@@ -26,11 +26,14 @@
        https://github.com/hypothesis/client/pull/243 is released.
      #}
     <!-- App Configuration !-->
+    <script src="https://api.dmcdn.net/all.js" type="text/javascript"></script>
+    <script src="https://player.vimeo.com/api/player.js" type="text/javascript"></script>    
     <script class="js-hypothesis-config js-hypothesis-settings" type="application/json">
       {{ app_config | safe }}
     </script>
 
     <!-- Client boot script !-->
+
     <script src="{{ embed_url }}"></script>
 
   </body>
